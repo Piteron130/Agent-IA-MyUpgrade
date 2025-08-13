@@ -1,0 +1,342 @@
+{
+  "name": "Sub-Productos",
+  "nodes": [
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "id": "c055762a-8fe7-4141-a639-df2372f30060",
+      "typeVersion": 1.1,
+      "name": "When Executed by Another Workflow",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "position": [
+        96,
+        352
+      ]
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        224,
+        592
+      ],
+      "id": "9d594f69-a23f-4d53-bd81-b5d2e40d9c04",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "PS7JXLd7xU6ZcfLv",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.query }}",
+        "options": {
+          "systemMessage": "=Eres el sub-agente de Productos de MyUpgrade. Tu única misión es gestionar el inventario de la tienda. Tu comunicación es solo con el agente principal.\n\nHerramientas a tu Disposición\nTool de Lectura de Inventario: Para consultar el stock de un producto.\n\nTool de Actualización de Inventario: Para modificar el stock de un producto.\n\nTarea 1: Reportar el Stock\nSi la instrucción es \"verificar\", \"leer\" o \"decir el stock\", tu única acción es:\n\nExtraer TIPO_PRENDA, TALLA y COLOR.\n\nUsar la Tool de Lectura con esos datos.\n\nReportar el stock actual al agente principal.\n\nTarea 2: Actualizar el Stock\nSi la instrucción es \"descontar\", \"sumar\" o \"actualizar\", tu única acción es:\n\nExtraer TIPO_PRENDA, TALLA, COLOR y la CANTIDAD del mensaje.\n\nUsar la Tool de Lectura para obtener el stock actual.\n\nCalcular el nuevo stock. Si la cantidad a descontar es mayor que el stock, reporta \"stock insuficiente\".\n\nUsa la Tool de Actualización con un JSON que incluya:\n\nTIPO_PRENDA\n\nTALLA\n\nCOLOR\n\nSTOCK (con el nuevo número calculado).\n\nReportar al agente principal que la actualización fue exitosa y cuál es el nuevo stock."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        480,
+        352
+      ],
+      "id": "03860b13-1052-41eb-8c92-2cf98deb429c",
+      "name": "Agente de Inventario"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1uWZB4EGHO1R7pb9OMW-PTCq6voDdIaWQQ4DP2cau5i4",
+          "mode": "list",
+          "cachedResultName": "DB",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1uWZB4EGHO1R7pb9OMW-PTCq6voDdIaWQQ4DP2cau5i4/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Inventario",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1uWZB4EGHO1R7pb9OMW-PTCq6voDdIaWQQ4DP2cau5i4/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.6,
+      "position": [
+        560,
+        704
+      ],
+      "id": "ee2b3951-19e1-48d8-8e7e-9b6b33491884",
+      "name": "STOCK",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "IdGruqgddVYgv4v5",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1uWZB4EGHO1R7pb9OMW-PTCq6voDdIaWQQ4DP2cau5i4",
+          "mode": "list",
+          "cachedResultName": "DB",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1uWZB4EGHO1R7pb9OMW-PTCq6voDdIaWQQ4DP2cau5i4/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Inventario",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1uWZB4EGHO1R7pb9OMW-PTCq6voDdIaWQQ4DP2cau5i4/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "TIPO_PRENDA": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('TIPO_PRENDA__using_to_match_', ``, 'string') }}",
+            "ID": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('ID', ``, 'string') }}",
+            "TALLA": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('TALLA', ``, 'string') }}",
+            "COLOR": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('COLOR', ``, 'string') }}",
+            "DISPONIBLE": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('DISPONIBLE', ``, 'string') }}",
+            "CANTIDAD_DISPONIBLE": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('CANTIDAD_DISPONIBLE', ``, 'string') }}",
+            "PRECIO_50_U": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('PRECIO_50_U', ``, 'string') }}",
+            "PRECIO_100_U": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('PRECIO_100_U', ``, 'string') }}",
+            "PRECIO_200_U": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('PRECIO_200_U', ``, 'string') }}"
+          },
+          "matchingColumns": [
+            "TIPO_PRENDA"
+          ],
+          "schema": [
+            {
+              "id": "ID",
+              "displayName": "ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "TIPO_PRENDA",
+              "displayName": "TIPO_PRENDA",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "TALLA",
+              "displayName": "TALLA",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "COLOR",
+              "displayName": "COLOR",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "CANTIDAD_DISPONIBLE",
+              "displayName": "CANTIDAD_DISPONIBLE",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "PRECIO_50_U",
+              "displayName": "PRECIO_50_U",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "PRECIO_100_U",
+              "displayName": "PRECIO_100_U",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "PRECIO_200_U",
+              "displayName": "PRECIO_200_U",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "DISPONIBLE",
+              "displayName": "DISPONIBLE",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "CATEGORÍA",
+              "displayName": "CATEGORÍA",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "DESCRIPCIÓN",
+              "displayName": "DESCRIPCIÓN",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.6,
+      "position": [
+        688,
+        704
+      ],
+      "id": "c8d07906-c7a8-4f1a-a5c0-0b3c62a50404",
+      "name": "Actualizar",
+      "alwaysOutputData": true,
+      "executeOnce": false,
+      "notesInFlow": false,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "IdGruqgddVYgv4v5",
+          "name": "Google Sheets account"
+        }
+      }
+    }
+  ],
+  "pinData": {
+    "When Executed by Another Workflow": [
+      {
+        "json": {
+          "query": "Resta del stock 2 Camisetas XXL BLANCO"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Agente de Inventario",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Agente de Inventario",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "STOCK": {
+      "ai_tool": [
+        [
+          {
+            "node": "Agente de Inventario",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Agente de Inventario": {
+      "main": [
+        []
+      ]
+    },
+    "Actualizar": {
+      "ai_tool": [
+        [
+          {
+            "node": "Agente de Inventario",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "c4e5986a-3dac-4c1b-8bed-995e81f93e88",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "992537069019c0eb14fde12dbecc97ec572791377f1b4b3f6542d63353a06d33"
+  },
+  "id": "YSzQoDI3fqdHNOjG",
+  "tags": []
+}

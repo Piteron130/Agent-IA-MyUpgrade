@@ -1,0 +1,250 @@
+{
+  "name": "Sub-Pedidos",
+  "nodes": [
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "id": "c055762a-8fe7-4141-a639-df2372f30060",
+      "typeVersion": 1.1,
+      "name": "When Executed by Another Workflow",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "position": [
+        144,
+        352
+      ]
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        368,
+        592
+      ],
+      "id": "b3317266-952a-4c45-907f-0f943ee89c4a",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "PS7JXLd7xU6ZcfLv",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.query }}",
+        "options": {
+          "systemMessage": "=Eres el sub-agente encargado de la Tool de Pedidos de MyUpgrade. Tu única responsabilidad es recopilar los datos del cliente y registrar el pedido. Asume que la verificación de inventario ya se realizó con éxito en un paso anterior.\n\nTu tarea es simple y directa:\n\nSolicitar datos al cliente: Pide de forma amable y clara la siguiente información, que es necesaria para procesar el pedido y el envío:\n\nNombre completo.\n\nCorreo electrónico.\n\nDirección de envío completa (calle, número, código postal, ciudad y país).\n\nRegistrar el pedido: Utiliza tu herramienta agregar_pedido para crear una nueva fila en la tabla de Pedidos. Esta fila debe incluir:\n\nInformación del cliente que acabas de solicitar (nombre, email, dirección).\n\nDetalles del producto (nombre, talla, cantidad) que ya fueron confirmados.\n\nUn ID de pedido único para la compra (ej. \"P-001\").\n\nTu objetivo es asegurar que todos los datos del cliente se registren de manera precisa y completa en la hoja de cálculo de Pedidos. Una vez que la información esté guardada, informa al sistema principal que el pedido ha sido cargado con éxito para que se pueda proceder con el siguiente paso (por ejemplo, el envío de email de confirmación)."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        528,
+        352
+      ],
+      "id": "cb755095-93d5-4326-91bf-f28b65d34359",
+      "name": "Agente Pedidos"
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Cargá el pedido con los datos",
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1uWZB4EGHO1R7pb9OMW-PTCq6voDdIaWQQ4DP2cau5i4",
+          "mode": "list",
+          "cachedResultName": "DB",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1uWZB4EGHO1R7pb9OMW-PTCq6voDdIaWQQ4DP2cau5i4/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 307833438,
+          "mode": "list",
+          "cachedResultName": "Pedidos",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1uWZB4EGHO1R7pb9OMW-PTCq6voDdIaWQQ4DP2cau5i4/edit#gid=307833438"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Nombre del Cliente": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Nombre_del_Cliente__using_to_match_', ``, 'string') }}",
+            "ID_PEDIDO": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('ID_PEDIDO', ``, 'string') }}",
+            "Dirección": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Direcci_n', ``, 'string') }}",
+            "Detalles del Pedido": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Detalles_del_Pedido', ``, 'string') }}",
+            "FECHA_CREACION": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('FECHA_CREACION', ``, 'string') }}",
+            "MAIL": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('MAIL', ``, 'string') }}",
+            "ESTADO": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('ESTADO', ``, 'string') }}"
+          },
+          "matchingColumns": [
+            "Nombre del Cliente"
+          ],
+          "schema": [
+            {
+              "id": "Nombre del Cliente",
+              "displayName": "Nombre del Cliente",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "ID_PEDIDO",
+              "displayName": "ID_PEDIDO",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Dirección",
+              "displayName": "Dirección",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Detalles del Pedido",
+              "displayName": "Detalles del Pedido",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "FECHA_CREACION",
+              "displayName": "FECHA_CREACION",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "MAIL",
+              "displayName": "MAIL",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "ESTADO",
+              "displayName": "ESTADO",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.6,
+      "position": [
+        672,
+        704
+      ],
+      "id": "3ecaf688-b5b3-4d65-a688-ca75f2b527c9",
+      "name": "Pedidos",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "IdGruqgddVYgv4v5",
+          "name": "Google Sheets account"
+        }
+      }
+    }
+  ],
+  "pinData": {
+    "When Executed by Another Workflow": [
+      {
+        "json": {
+          "Nombre_del_Cliente": "Pedro Rocha Carnovale",
+          "ID_PEDIDO": "P-001",
+          "Direcci_n": "Mi casa 455",
+          "Detalles_del_Pedido": "Camiseta XXL Blanca",
+          "FECHA_CREACION": "2024-06-10",
+          "MAIL": "rochita@gmail.com",
+          "ESTADO": "Pendiente"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Agente Pedidos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Agente Pedidos",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pedidos": {
+      "ai_tool": [
+        [
+          {
+            "node": "Agente Pedidos",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "38dd0944-4829-4f46-96fe-1f12049b9e75",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "992537069019c0eb14fde12dbecc97ec572791377f1b4b3f6542d63353a06d33"
+  },
+  "id": "x3add3n6F6Ibov52",
+  "tags": []
+}

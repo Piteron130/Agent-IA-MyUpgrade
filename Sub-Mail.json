@@ -1,0 +1,220 @@
+{
+  "name": "Sub-Mail",
+  "nodes": [
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "id": "c055762a-8fe7-4141-a639-df2372f30060",
+      "typeVersion": 1.1,
+      "name": "When Executed by Another Workflow",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "position": [
+        -32,
+        352
+      ]
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        400,
+        560
+      ],
+      "id": "3ccd8142-43cd-4304-b50b-ef7669c2c626",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "PS7JXLd7xU6ZcfLv",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('To', ``, 'string') }}",
+        "subject": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Subject', ``, 'string') }}",
+        "message": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Message', ``, 'string') }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.1,
+      "position": [
+        736,
+        704
+      ],
+      "id": "e8fca367-e9f1-4431-92a3-21828ee71179",
+      "name": "Send a Email",
+      "webhookId": "69c47a56-831b-4f85-9a91-fadc9e5a8493",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "SezJPpJvvH8oxSrG",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1uWZB4EGHO1R7pb9OMW-PTCq6voDdIaWQQ4DP2cau5i4",
+          "mode": "list",
+          "cachedResultName": "DB",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1uWZB4EGHO1R7pb9OMW-PTCq6voDdIaWQQ4DP2cau5i4/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 307833438,
+          "mode": "list",
+          "cachedResultName": "Pedidos",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1uWZB4EGHO1R7pb9OMW-PTCq6voDdIaWQQ4DP2cau5i4/edit#gid=307833438"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.6,
+      "position": [
+        608,
+        704
+      ],
+      "id": "e00cbe2b-a47e-4a83-8bed-ae1caad7a0cf",
+      "name": "Contactos",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "IdGruqgddVYgv4v5",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('When Executed by Another Workflow').item.json.query }}",
+        "options": {
+          "systemMessage": "=Eres el sub-agente encargado de la Tool de Email de MyUpgrade. Tu única tarea es redactar y enviar un correo electrónico de confirmación de pedido a un cliente, utilizando los datos que te proporciona el agente principal.\n\nInstrucciones\nasegúrate de que el mensaje sea profesional, claro y agradecido.\n\nPlantilla del Email\nAsunto:\n¡Tu pedido en MyUpgrade ha sido confirmado! (# {ID_PEDIDO} )\n\nCuerpo del Mensaje:\n{{ $json.HTML }}\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        528,
+        352
+      ],
+      "id": "cb7f0770-a183-4c45-8b35-4e7a3f3e4d8c",
+      "name": "Mail Agent"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "28b24f3b-4510-46f6-b1a6-89cdf9e64858",
+              "name": "HTML",
+              "value": "=<!DOCTYPE html>\n<html lang=\"es\">\n<head>\n  <meta charset=\"UTF-8\">\n  <meta http-equiv=\"X-UA-Compatible\" content=\"IE=edge\">\n  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n  <title>Confirmación de Compra MyUpgrade</title>\n</head>\n<body style=\"margin: 0; padding: 0;\">\n  <table role=\"presentation\" width=\"100%\" style=\"border-collapse: collapse; border: 0; border-spacing: 0; background-color: #f4f4f4;\">\n    <tr>\n      <td align=\"center\" style=\"padding: 20px;\">\n        <table role=\"presentation\" width=\"600\" style=\"border-collapse: collapse; border: 1px solid #cccccc; border-spacing: 0; text-align: left; background-color: #ffffff;\">\n          <tr>\n            <td style=\"padding: 30px; background-color: #333333; color: #ffffff;\">\n              <h1 style=\"font-family: sans-serif; margin: 0;\">Confirmación de Compra MyUpgrade</h1>\n            </td>\n          </tr>\n          <tr>\n            <td style=\"padding: 30px;\">\n              <h2 style=\"font-family: sans-serif; color: #333333; margin: 0 0 20px 0;\">¡Hola {{ $json.nombre_cliente }}!</h2>\n              <p style=\"font-family: sans-serif; color: #333333; margin: 0 0 12px 0; font-size: 16px; line-height: 24px;\">Gracias por tu compra en MyUpgrade. A continuación, te mostramos los detalles de tu pedido:</p>\n              <table role=\"presentation\" width=\"100%\" style=\"border-collapse: collapse; border-spacing: 0; margin-top: 20px;\">\n                <tr>\n                  <td style=\"padding: 10px; border-bottom: 1px solid #cccccc; font-family: sans-serif; font-size: 14px;\">\n                    **Producto:** {{ $json.producto_nombre }}\n                  </td>\n                </tr>\n                <tr>\n                  <td style=\"padding: 10px; border-bottom: 1px solid #cccccc; font-family: sans-serif; font-size: 14px;\">\n                    **Cantidad:** {{ $json.cantidad }}\n                  </td>\n                </tr>\n                <tr>\n                  <td style=\"padding: 10px; border-bottom: 1px solid #cccccc; font-family: sans-serif; font-size: 14px;\">\n                    **Precio:** {{ $json.precio }}\n                  </td>\n                </tr>\n              </table>\n              <p style=\"font-family: sans-serif; color: #333333; margin: 20px 0 0 0; font-size: 16px; line-height: 24px;\">El envío se realizará a la dirección: {{ $json.direccion_envio }}.</p>\n              <p style=\"font-family: sans-serif; color: #333333; margin: 20px 0 0 0; font-size: 16px; line-height: 24px;\">Tu número de pedido es: **{{ $json.ID_Pedido }}**.</p>\n              <p style=\"font-family: sans-serif; color: #333333; margin: 20px 0 0 0; font-size: 16px; line-height: 24px;\">Si tienes alguna pregunta, no dudes en contactarnos.</p>\n            </td>\n          </tr>\n          <tr>\n            <td style=\"padding: 30px; text-align: center; font-size: 12px; background-color: #eeeeee; color: #666666; font-family: sans-serif;\">\n              <p style=\"margin: 0;\">&copy; MyUpgrade 2025</p>\n            </td>\n          </tr>\n        </table>\n      </td>\n    </tr>\n  </table>\n</body>\n</html>",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        256,
+        352
+      ],
+      "id": "8076ca16-e95a-457b-a519-03fe72fc7e37",
+      "name": "HTML"
+    }
+  ],
+  "pinData": {
+    "When Executed by Another Workflow": [
+      {
+        "json": {
+          "query": "enviale el pedido a rocha.pedro238@gmail.com. nombre:pedro rocha, direccion 475 savio, cp 1620. productos:5 pantalones xxl negro"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "HTML",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Mail Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a Email": {
+      "ai_tool": [
+        [
+          {
+            "node": "Mail Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Contactos": {
+      "ai_tool": [
+        [
+          {
+            "node": "Mail Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mail Agent": {
+      "main": [
+        []
+      ]
+    },
+    "HTML": {
+      "main": [
+        [
+          {
+            "node": "Mail Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "5626771f-8fc2-40ca-8ad7-318c02a89289",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "992537069019c0eb14fde12dbecc97ec572791377f1b4b3f6542d63353a06d33"
+  },
+  "id": "D6YtzKhOkmY1yqkX",
+  "tags": []
+}

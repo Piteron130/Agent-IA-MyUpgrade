@@ -1,0 +1,572 @@
+{
+  "name": "Agent B2B",
+  "nodes": [
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.messages[0].text.body }}",
+                    "rightValue": "={{ $json.body.messages[0].text }}",
+                    "operator": {
+                      "type": "string",
+                      "operation": "exists",
+                      "singleValue": true
+                    },
+                    "id": "2b435080-f3be-45bd-9ee2-461289d81771"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Texto"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "ce02913f-6854-4bc5-915f-b6073adb64ab",
+                    "leftValue": "={{ $json.messages[0].type }}",
+                    "rightValue": "={{ $json.body.messages[0].voice }}",
+                    "operator": {
+                      "type": "string",
+                      "operation": "exists",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Audio"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        288,
+        1200
+      ],
+      "id": "60361789-2b74-4566-ad62-39bb819d4157",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "28b24f3b-4510-46f6-b1a6-89cdf9e64858",
+              "name": "Texto",
+              "value": "={{ $json.messages[0].text.body }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        752,
+        1200
+      ],
+      "id": "a8ce2b63-b55c-4ba8-a89a-29f0bacbb6b4",
+      "name": "Captura Texto"
+    },
+    {
+      "parameters": {
+        "resource": "media",
+        "operation": "mediaUrlGet",
+        "mediaGetId": "={{ $json.messages[0].audio.id }}"
+      },
+      "type": "n8n-nodes-base.whatsApp",
+      "typeVersion": 1,
+      "position": [
+        480,
+        1408
+      ],
+      "id": "3e08080c-930d-4c4f-82ce-64697eda20f7",
+      "name": "Download media",
+      "webhookId": "f88cc302-2323-4d01-9f6e-c6d06d548a8e",
+      "credentials": {
+        "whatsAppApi": {
+          "id": "sbZfGYJY6wYBElfu",
+          "name": "WhatsApp account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "updates": [
+          "messages",
+          "message_template_status_update"
+        ],
+        "options": {}
+      },
+      "type": "n8n-nodes-base.whatsAppTrigger",
+      "typeVersion": 1,
+      "position": [
+        16,
+        1200
+      ],
+      "id": "ab639bf1-7693-4053-9d82-eba4606efad3",
+      "name": "W-Recibir",
+      "webhookId": "71d37cd9-9c76-4c4b-a9ca-ea5afb55897c",
+      "notesInFlow": false,
+      "credentials": {
+        "whatsAppTriggerApi": {
+          "id": "b9Ehm3zAvfQRjOmh",
+          "name": "Agent Inventory"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "28b24f3b-4510-46f6-b1a6-89cdf9e64858",
+              "name": "Texto",
+              "value": "={{ $json.messages[0].text.body }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1056,
+        1408
+      ],
+      "id": "0d5fa89e-569e-4e85-b18a-fc9478c368c4",
+      "name": "Capt Texto"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.url }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        656,
+        1408
+      ],
+      "id": "de6b65ca-95c0-4036-ae5d-948b05f6ff8c",
+      "name": "HTTP Request",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "ygtSCloSMYkeXNMr",
+          "name": "Header Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "audio",
+        "operation": "transcribe",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        864,
+        1408
+      ],
+      "id": "c7a37f17-7f61-435c-a335-46114d11916d",
+      "name": "Transcribir audio",
+      "alwaysOutputData": true,
+      "executeOnce": false,
+      "retryOnFail": false,
+      "credentials": {
+        "openAiApi": {
+          "id": "PS7JXLd7xU6ZcfLv",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        1232,
+        1680
+      ],
+      "id": "75fc9dff-ce51-4e53-9f5b-161e9a37e546",
+      "name": "OpenAI Chat Model3",
+      "credentials": {
+        "openAiApi": {
+          "id": "PS7JXLd7xU6ZcfLv",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "description": "Llamar a esta Tool únicamente cuando el pedido esté registrado.",
+        "workflowId": {
+          "__rl": true,
+          "value": "D6YtzKhOkmY1yqkX",
+          "mode": "list",
+          "cachedResultName": "Sub-Agente"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "número",
+              "displayName": "número",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": true
+            },
+            {
+              "id": "nombre",
+              "displayName": "nombre",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": true
+            },
+            {
+              "id": "email",
+              "displayName": "email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        1872,
+        1856
+      ],
+      "id": "ce7a7e0b-5053-4693-9880-b0e9bd3d3b54",
+      "name": "Email Agent"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('W-Recibir').item.json.messages[0].text.body }}",
+        "options": {
+          "systemMessage": "=Eres el Agente Principal de ventas de MyUpgrade. Tu misión es ser la cara amigable de la tienda, guiando al cliente de forma fluida a través de su compra. Tu rol es orquestar las acciones de las siguientes herramientas, asegurando que cada paso se complete correctamente.\n\nHerramientas a tu Disposición\nTool de Productos: Experto en inventario y precios. Lo usas para verificar stock y obtener el precio.\n\nTool de Pedidos: Para registrar la venta y los datos del cliente.\n\nTool de Email: Para enviar el comprobante de compra.\n\nFlujo de Venta (Protocolo Estricto)\nAgregar Producto y Continuar: Cuando el cliente pida un producto (ej. \"dos pantalones xxl blancos\"):\n\nUsa la Tool de Productos para verificar stock y precio unitario.\n\nSi hay stock, responde de forma amigable confirmando la disponibilidad y el precio.\n\nPregunta al cliente si desea agregar algo más al pedido o si quiere finalizar la compra.\n\nProcesar Compra Final: Solo si el cliente dice \"finalizar la compra\" o \"pagar\", el agente debe:\n\nUsar sus tools para identificar todos los productos y cantidades que el cliente ha mencionado en la conversación.\n\nSumar el precio de todos los productos para obtener el total del pedido y devolverle el mensaje de sus articulos que comprará\n\nUsar la Tool de Productos para descontar el stock de todos los ítems del carrito al mismo tiempo.\n\nUsar la Tool de Pedidos para registrar un único pedido con todos los detalles de los productos, la cantidad y el precio total.\n\nSolicitar al cliente sus datos de envío y contacto.\n\nFinalizar y Enviar: Una vez que el pedido esté registrado, usa la Tool de Email para enviar el comprobante de compra. Cierra la conversación de forma profesional y amigable.\n\nRecuerda: Mantén un tono cordial y usa el contexto de la conversación para no pedir datos que ya te hayan dado."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        1616,
+        1392
+      ],
+      "id": "a4b91f39-1fa8-473e-b636-1ec2a6aa3976",
+      "name": "Ai Agent"
+    },
+    {
+      "parameters": {
+        "description": "Llamar a esta Tool para cualquier acción con Inventario",
+        "workflowId": {
+          "__rl": true,
+          "value": "YSzQoDI3fqdHNOjG",
+          "mode": "list",
+          "cachedResultName": "Sub-Productos"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        1648,
+        1856
+      ],
+      "id": "3f2af824-b731-4806-b7d7-024afad3b387",
+      "name": "Inventario"
+    },
+    {
+      "parameters": {
+        "description": "Llamar a esta Tool para ir cargando el pedido del cliente",
+        "workflowId": {
+          "__rl": true,
+          "value": "x3add3n6F6Ibov52",
+          "mode": "list",
+          "cachedResultName": "Sub-Pedidos"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        1760,
+        1856
+      ],
+      "id": "27cfe59f-0ec2-4dbf-ac68-fb9ec6a912f9",
+      "name": "Pedidos"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('W-Recibir').item.json.metadata.phone_number_id }}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
+      "typeVersion": 1.3,
+      "position": [
+        1408,
+        1680
+      ],
+      "id": "b77544a3-2d73-4cf3-aee8-14fcf3523a43",
+      "name": "Postgres Chat Memory",
+      "credentials": {
+        "postgres": {
+          "id": "Khmu5poM3nGrex99",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "send",
+        "phoneNumberId": "697588343445901",
+        "recipientPhoneNumber": "+54 11 15 65718998",
+        "textBody": "={{ $json.output }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.whatsApp",
+      "typeVersion": 1,
+      "position": [
+        2160,
+        1392
+      ],
+      "id": "e9620c82-d9fc-4372-b0b0-a9a7920d574b",
+      "name": "N8N Agent Resp",
+      "webhookId": "c0a52a67-4d90-444d-b969-0c36c52bffb8",
+      "credentials": {
+        "whatsAppApi": {
+          "id": "sbZfGYJY6wYBElfu",
+          "name": "WhatsApp account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Captura Texto",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Download media",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Captura Texto": {
+      "main": [
+        [
+          {
+            "node": "Ai Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download media": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "W-Recibir": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Capt Texto": {
+      "main": [
+        [
+          {
+            "node": "Ai Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Transcribir audio",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transcribir audio": {
+      "main": [
+        [
+          {
+            "node": "Capt Texto",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model3": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Ai Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Email Agent": {
+      "ai_tool": [
+        [
+          {
+            "node": "Ai Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ai Agent": {
+      "main": [
+        [
+          {
+            "node": "N8N Agent Resp",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Inventario": {
+      "ai_tool": [
+        [
+          {
+            "node": "Ai Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pedidos": {
+      "ai_tool": [
+        [
+          {
+            "node": "Ai Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres Chat Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "Ai Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "3b8ea324-25ef-443a-bcf6-7fb3aa24b854",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "992537069019c0eb14fde12dbecc97ec572791377f1b4b3f6542d63353a06d33"
+  },
+  "id": "3j0bEfnT2zmicUgB",
+  "tags": []
+}
